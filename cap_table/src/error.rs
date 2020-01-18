@@ -7,7 +7,6 @@ pub enum CapTableError {
     NoCSVFileSupplied,
     UnableToOpenCSVFileForRead(std::io::Error),
     UnableToReadCSVData(csv::Error),
-    NoDataInCSVFile,
 
     // Problems with the JSON output file
     UnableToOpenJSONOutputFileForWrite,
