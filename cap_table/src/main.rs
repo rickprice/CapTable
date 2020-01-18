@@ -108,22 +108,36 @@ fn testable_main(
         .map_err(|e| CapTableError::UnableToOpenCSVFileForRead(e))?;
 
     let mut rdr = csv::Reader::from_reader(input_file);
-    for result in rdr.deserialize() {
-        // Notice that we need to provide a type hint for automatic
-        // deserialization.
-        // We map the error so that we can return it in our own structure
-        let record: Record = result.map_err(|e| CapTableError::UnableToReadCSVData(e))?;
-        println!("{:?}", record);
-    }
+
+    //    for result in rdr.deserialize() {
+    //        // Notice that we need to provide a type hint for automatic
+    //        // deserialization.
+    //        // We map the error so that we can return it in our own structure
+    //        let record: Record = result.map_err(|e| CapTableError::UnableToReadCSVData(e))?;
+    //        println!("{:?}", record);
+    //    }
 
     // Get an iterator of some sort to our Records, if we hit an error, then quit the program with
     // an error
-    let all_records = rdr.deserialize().map(|r:std::result::Result<Record, csv::Error>| r.map_err(|e| CapTableError::UnableToReadCSVData(e)).unwrap());
+    let all_records = rdr
+        .deserialize()
+        .map(|r: std::result::Result<Record, csv::Error>| {
+            r.map_err(|e| CapTableError::UnableToReadCSVData(e))
+                .unwrap()
+        });
+
+    //        println!("+++ REMOVE THIS +++ This is all_records {:?}", all_records.collect::<Vec<_>>());
 
     // Now define another iterator that filters the records based on report date
-    let records = all_records.filter(|r| match report_date {None => true, Some(filter_date) => r.investment_date <= filter_date});
+    let records = all_records.filter(|r| match report_date {
+        None => true,
+        Some(filter_date) => r.investment_date <= filter_date,
+    });
 
-    
+    println!(
+        "+++ REMOVE THIS +++ We now have these records to work with {:?}",
+        records.collect::<Vec<_>>()
+    );
 
     return Ok(());
 }
