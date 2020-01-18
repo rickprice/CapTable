@@ -2,6 +2,7 @@ extern crate cap_table_error;
 extern crate chrono;
 extern crate clap;
 extern crate csv;
+extern crate serde;
 
 use cap_table_error::error::CapTableError;
 use chrono::NaiveDate;
@@ -9,6 +10,8 @@ use clap::{crate_version, App, Arg};
 
 use std::fs::File;
 use std::path::Path;
+
+use serde::Deserialize;
 
 fn main() -> Result<(), CapTableError> {
     let matches = App::new("Cap Table Program")
@@ -69,6 +72,18 @@ fn main() -> Result<(), CapTableError> {
     Ok(())
 }
 
+#[derive(Debug, Deserialize)]
+struct Record {
+    #[serde(rename(deserialize = "#INVESTMENT DATE"))]
+    investment_date: String,
+    #[serde(rename(deserialize = " SHARES PURCHASED"))]
+    shares_purchased: u64,
+    #[serde(rename(deserialize = " CASH PAID"))]
+    cash_paid: f64,
+    #[serde(rename(deserialize = " INVESTOR"))]
+    investor: String,
+}
+
 fn testable_main(
     input_file_path: &str,
     output_file_path: Option<&str>,
@@ -103,11 +118,10 @@ fn testable_main(
         .map_err(|e| CapTableError::UnableToOpenCSVFileForRead(e))?;
 
     let mut rdr = csv::Reader::from_reader(input_file);
-    for result in rdr.records() {
-        // The iterator yields Result<StringRecord, Error>, so we check the
-        // error here.
-        //        let record = result?;
-        let record = result.expect("problem with CSV record");
+    for result in rdr.deserialize() {
+        // Notice that we need to provide a type hint for automatic
+        // deserialization.
+        let record: Record = result.map_err(|e| CapTableError::UnableToReadCSVData(e))?;
         println!("{:?}", record);
     }
 
