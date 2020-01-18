@@ -12,13 +12,13 @@ pub struct Record {
         rename(deserialize = "#INVESTMENT DATE"),
         deserialize_with = "naive_date_from_str"
     )]
-    investment_date: NaiveDate,
+    pub investment_date: NaiveDate,
     #[serde(rename(deserialize = " SHARES PURCHASED"))]
-    shares_purchased: u64,
+    pub shares_purchased: u64,
     #[serde(rename(deserialize = " CASH PAID"))]
-    cash_paid: f64,
+    pub cash_paid: f64,
     #[serde(rename(deserialize = " INVESTOR"))]
-    investor: String,
+    pub investor: String,
 }
 
 fn naive_date_from_str<'de, D>(deserializer: D) -> Result<NaiveDate, D::Error>

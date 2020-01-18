@@ -118,7 +118,12 @@ fn testable_main(
 
     // Get an iterator of some sort to our Records, if we hit an error, then quit the program with
     // an error
-    let records = rdr.deserialize().map(|r:std::result::Result<Record, csv::Error>| r.map_err(|e| CapTableError::UnableToReadCSVData(e)).unwrap());
+    let all_records = rdr.deserialize().map(|r:std::result::Result<Record, csv::Error>| r.map_err(|e| CapTableError::UnableToReadCSVData(e)).unwrap());
+
+    // Now define another iterator that filters the records based on report date
+    let records = all_records.filter(|r| match report_date {None => true, Some(filter_date) => r.investment_date <= filter_date});
+
+    
 
     return Ok(());
 }
