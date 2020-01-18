@@ -109,14 +109,6 @@ fn testable_main(
 
     let mut rdr = csv::Reader::from_reader(input_file);
 
-    //    for result in rdr.deserialize() {
-    //        // Notice that we need to provide a type hint for automatic
-    //        // deserialization.
-    //        // We map the error so that we can return it in our own structure
-    //        let record: Record = result.map_err(|e| CapTableError::UnableToReadCSVData(e))?;
-    //        println!("{:?}", record);
-    //    }
-
     // Get an iterator of some sort to our Records, if we hit an error, then quit the program with
     // an error
     let all_records = rdr
