@@ -13,5 +13,5 @@ pub enum CapTableError {
     UnableToOpenJSONOutputFileForWrite,
 
     // Problems with the report date
-    InvalidReportDateSupplied,
+    InvalidReportDateSupplied(chrono::ParseError),
 }

@@ -59,12 +59,9 @@ fn main() -> Result<(), CapTableError> {
     // fails, then return an error...
     let report_date = match matches.value_of("reportDate") {
         None => None,
-        // we ignore the exact error returned by parse_from_str here, we just flag it as an invalid
-        // date, but we could have maybe returned it to the user in the InvalidReportDateSupplied
-        // enum value.
         Some(s) => Some(
             NaiveDate::parse_from_str(s, "%Y-%m-%d")
-                .map_err(|_e| CapTableError::InvalidReportDateSupplied)?,
+                .map_err(|e| CapTableError::InvalidReportDateSupplied(e))?,
         ),
     };
 
