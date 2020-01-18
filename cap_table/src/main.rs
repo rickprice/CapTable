@@ -4,14 +4,17 @@ extern crate clap;
 extern crate csv;
 extern crate serde;
 
-use cap_table_error::error::CapTableError;
+mod error;
+mod model;
+
 use chrono::NaiveDate;
 use clap::{crate_version, App, Arg};
+use error::CapTableError;
 
 use std::fs::File;
 use std::path::Path;
 
-use serde::Deserialize;
+use model::Record;
 
 fn main() -> Result<(), CapTableError> {
     let matches = App::new("Cap Table Program")
@@ -70,18 +73,6 @@ fn main() -> Result<(), CapTableError> {
     testable_main(input_file_path, output_file_path, report_date)?;
 
     Ok(())
-}
-
-#[derive(Debug, Deserialize)]
-struct Record {
-    #[serde(rename(deserialize = "#INVESTMENT DATE"))]
-    investment_date: String,
-    #[serde(rename(deserialize = " SHARES PURCHASED"))]
-    shares_purchased: u64,
-    #[serde(rename(deserialize = " CASH PAID"))]
-    cash_paid: f64,
-    #[serde(rename(deserialize = " INVESTOR"))]
-    investor: String,
 }
 
 fn testable_main(
