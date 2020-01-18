@@ -61,6 +61,7 @@ fn main() -> Result<(), CapTableError> {
         None => None,
         Some(s) => Some(
             NaiveDate::parse_from_str(s, "%Y-%m-%d")
+                // We map the error so that we can return it in our own structure
                 .map_err(|e| CapTableError::InvalidReportDateSupplied(e))?,
         ),
     };
@@ -103,12 +104,14 @@ fn testable_main(
     let input_file_path_path = Path::new(input_file_path);
     // This time, if we have an error, pass the error value into the CapTableError...
     let input_file = File::open(&input_file_path_path)
+        // We map the error so that we can return it in our own structure
         .map_err(|e| CapTableError::UnableToOpenCSVFileForRead(e))?;
 
     let mut rdr = csv::Reader::from_reader(input_file);
     for result in rdr.deserialize() {
         // Notice that we need to provide a type hint for automatic
         // deserialization.
+        // We map the error so that we can return it in our own structure
         let record: Record = result.map_err(|e| CapTableError::UnableToReadCSVData(e))?;
         println!("{:?}", record);
     }
