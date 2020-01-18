@@ -7,7 +7,7 @@ extern crate serde;
 mod error;
 mod model;
 
-use chrono::NaiveDate;
+use chrono::{NaiveDate,Local};
 use clap::{crate_version, App, Arg};
 use error::CapTableError;
 
@@ -120,11 +120,13 @@ fn testable_main(
 
     //        println!("+++ REMOVE THIS +++ This is all_records {:?}", all_records.collect::<Vec<_>>());
 
-    // Now define another iterator that filters the records based on report date
-    let records = all_records.filter(|r| match report_date {
-        None => true,
-        Some(filter_date) => r.investment_date <= filter_date,
-    });
+    // If no report_date has been specified, then use the current date
+    let filter_date = match report_date {
+        None => Local::today().naive_local(),
+        Some(filter_date) => filter_date,
+    };
+
+    let records = all_records.filter(|r| r.investment_date <= filter_date);
 
     println!(
         "+++ REMOVE THIS +++ We now have these records to work with {:?}",
