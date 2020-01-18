@@ -2,4 +2,5 @@
 members = [
     "cap_table",
     "cap_table_lib",
+    "cap_table_error",
 ]
