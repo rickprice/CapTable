@@ -116,5 +116,9 @@ fn testable_main(
         println!("{:?}", record);
     }
 
+    // Get an iterator of some sort to our Records, if we hit an error, then quit the program with
+    // an error
+    let records = rdr.deserialize().map(|r:std::result::Result<Record, csv::Error>| r.map_err(|e| CapTableError::UnableToReadCSVData(e)).unwrap());
+
     return Ok(());
 }
