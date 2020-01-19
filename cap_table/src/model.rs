@@ -32,14 +32,14 @@ where
 }
 
 #[derive(Debug)]
-pub struct OwnershipRecord<'a> {
-    pub investor: &'a str,
+pub struct OwnershipRecord {
+    pub investor: String,
     pub shares: u64,
     pub cash_paid: f64,
 }
 
-impl<'a> OwnershipRecord<'a> {
-    pub fn new(investor: &'a str, shares: u64, cash_paid: f64) -> OwnershipRecord<'a> {
+impl OwnershipRecord {
+    pub fn new(investor: String, shares: u64, cash_paid: f64) -> OwnershipRecord {
         OwnershipRecord {
             investor,
             shares,
@@ -49,15 +49,15 @@ impl<'a> OwnershipRecord<'a> {
 }
 
 #[derive(Debug)]
-pub struct OutputAccumulator<'a> {
+pub struct OutputAccumulator {
     pub date: NaiveDate,
     pub cash_raised: f64,
     pub total_number_of_shares: u64,
-    pub ownership_accumulator: HashMap<&'a str, OwnershipRecord<'a>>,
+    pub ownership_accumulator: HashMap<String, OwnershipRecord>,
 }
 
-impl<'a> OutputAccumulator<'a> {
-    pub fn new(date: NaiveDate) -> OutputAccumulator<'a> {
+impl OutputAccumulator {
+    pub fn new(date: NaiveDate) -> OutputAccumulator {
         OutputAccumulator {
             date,
             cash_raised: 0.0,
@@ -67,7 +67,7 @@ impl<'a> OutputAccumulator<'a> {
     }
 }
 
-impl<'a> OutputAccumulator<'a> {
+impl OutputAccumulator {
     pub fn accumulate_ownership_transactions(
         &mut self,
         transaction_records: impl Iterator<Item = Record>,
@@ -82,6 +82,10 @@ impl<'a> OutputAccumulator<'a> {
 
             self.cash_raised += re.cash_paid;
             self.total_number_of_shares += re.shares_purchased;
+
+            let record_entry = self.ownership_accumulator.entry(re.investor.clone()).or_insert_with(|| OwnershipRecord::new(re.investor.clone(),0,0.0));
+            record_entry.shares += re.shares_purchased;
+            record_entry.cash_paid += re.cash_paid;
         });
     }
 }
