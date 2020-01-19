@@ -70,7 +70,10 @@ impl<'a> OutputAccumulator<'a> {
 impl<'a> OutputAccumulator<'a> {
     pub fn accumulate_ownership_transactions(
         &mut self,
-        transaction_records: &dyn std::iter::Iterator<Item = Record>,
+        transaction_records: impl Iterator<Item = Record>,
     ) {
+        let records = transaction_records.filter(|r| r.investment_date <= self.date);
+
+        records.for_each(|a| println!("the value is {:?}", a));
     }
 }

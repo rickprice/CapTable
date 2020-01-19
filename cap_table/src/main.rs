@@ -125,16 +125,9 @@ fn testable_main(
         Some(filter_date) => filter_date,
     };
 
-    let records = all_records.filter(|r| r.investment_date <= filter_date);
-
-    //    println!(
-    //        "+++ REMOVE THIS +++ We now have these records to work with {:?}",
-    //        records.collect::<Vec<_>>()
-    //    );
-
     let mut output_accumulator = OutputAccumulator::new(filter_date);
 
-    output_accumulator.accumulate_ownership_transactions(&records);
+    output_accumulator.accumulate_ownership_transactions(all_records);
 
     return Ok(());
 }
