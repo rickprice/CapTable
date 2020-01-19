@@ -13,4 +13,7 @@ pub enum CapTableError {
 
     // Problems with the report date
     InvalidReportDateSupplied(chrono::ParseError),
+
+    // General problems
+    TotalSharesIsZero,
 }

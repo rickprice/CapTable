@@ -45,6 +45,7 @@ pub struct OwnershipRecord {
     pub investor: String,
     pub shares: u64,
     pub cash_paid: f64,
+    pub ownership: f64,
 }
 
 impl OwnershipRecord {
@@ -53,7 +54,12 @@ impl OwnershipRecord {
             investor,
             shares,
             cash_paid,
+            ownership:0.0,
         }
+    }
+
+    pub fn fix_ownership_percentage(&mut self,total_shares: u64) {
+        self.ownership = (self.shares as f64)/(total_shares as f64);
     }
 }
 
@@ -105,6 +111,8 @@ impl OutputAccumulator {
             record_entry.shares += re.shares_purchased;
             record_entry.cash_paid += re.cash_paid;
         });
+
+        ownership_accumulator.values_mut().for_each(|r| r.fix_ownership_percentage(self.total_number_of_shares));
 
         // I hate having to a clone here, maybe there is a way to pull the value out instead to
         // avoid the memory turnover
