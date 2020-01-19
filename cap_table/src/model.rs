@@ -1,14 +1,14 @@
-extern crate cap_table_error;
 extern crate chrono;
 extern crate serde;
+extern crate serde_json;
 
 use chrono::NaiveDate;
 
-use serde::{de, Deserialize, Deserializer};
+use serde::{de, Serialize, Deserialize, Deserializer};
 
 use std::collections::HashMap;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
     #[serde(
         rename(deserialize = "#INVESTMENT DATE"),
@@ -31,7 +31,7 @@ where
     NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(de::Error::custom)
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Serialize)]
 pub struct OwnershipRecord {
     pub investor: String,
     pub shares: u64,
