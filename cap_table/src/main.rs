@@ -133,6 +133,8 @@ fn testable_main(
     //    let serialized = serde_json::to_string(&output_accumulator).unwrap();
     let serialized = serde_json::to_string_pretty(&output_accumulator).unwrap();
 
+    println!();
+    println!();
     println!("serialized = {}", serialized);
 
     return Ok(());
