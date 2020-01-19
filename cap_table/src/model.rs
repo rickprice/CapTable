@@ -36,6 +36,8 @@ fn naive_date_to_str<S>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Err
 where
     S: Serializer,
 {
+    // I don't like serializing with a different format than we deserialize with, maybe there is a
+    // way to pass in a custom format parameter...
     let s = format!("{}", date.format("%m/%d/%Y"));
     serializer.serialize_str(&s)
 }
