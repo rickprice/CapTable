@@ -59,7 +59,7 @@ impl OwnershipRecord {
     }
 
     pub fn fix_ownership_percentage(&mut self,total_shares: u64) {
-        self.ownership = (self.shares as f64)/(total_shares as f64);
+        self.ownership = (self.shares as f64)/(total_shares as f64)*100.0;
     }
 }
 
