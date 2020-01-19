@@ -7,13 +7,14 @@ extern crate serde;
 mod error;
 mod model;
 
-use chrono::{NaiveDate,Local};
+use chrono::{Local, NaiveDate};
 use clap::{crate_version, App, Arg};
 use error::CapTableError;
 
 use std::fs::File;
 use std::path::Path;
 
+use model::OutputAccumulator;
 use model::Record;
 
 fn main() -> Result<(), CapTableError> {
@@ -126,10 +127,14 @@ fn testable_main(
 
     let records = all_records.filter(|r| r.investment_date <= filter_date);
 
-    println!(
-        "+++ REMOVE THIS +++ We now have these records to work with {:?}",
-        records.collect::<Vec<_>>()
-    );
+    //    println!(
+    //        "+++ REMOVE THIS +++ We now have these records to work with {:?}",
+    //        records.collect::<Vec<_>>()
+    //    );
+
+    let mut output_accumulator = OutputAccumulator::new(filter_date);
+
+    output_accumulator.accumulate_ownership_transactions(&records);
 
     return Ok(());
 }

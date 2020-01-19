@@ -31,7 +31,6 @@ where
     NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(de::Error::custom)
 }
 
-
 #[derive(Debug)]
 pub struct OwnershipRecord<'a> {
     pub investor: &'a str,
@@ -40,7 +39,7 @@ pub struct OwnershipRecord<'a> {
 }
 
 impl<'a> OwnershipRecord<'a> {
-    pub fn new(investor: &'a str,shares: u64,cash_paid: f64) -> OwnershipRecord<'a> {
+    pub fn new(investor: &'a str, shares: u64, cash_paid: f64) -> OwnershipRecord<'a> {
         OwnershipRecord {
             investor,
             shares,
@@ -49,24 +48,29 @@ impl<'a> OwnershipRecord<'a> {
     }
 }
 
-
 #[derive(Debug)]
 pub struct OutputAccumulator<'a> {
     pub date: NaiveDate,
     pub cash_raised: f64,
     pub total_number_of_shares: u64,
-    pub ownership_accumulator: HashMap<&'a str,OwnershipRecord<'a>>,
+    pub ownership_accumulator: HashMap<&'a str, OwnershipRecord<'a>>,
 }
 
 impl<'a> OutputAccumulator<'a> {
     pub fn new(date: NaiveDate) -> OutputAccumulator<'a> {
         OutputAccumulator {
             date,
-            cash_raised:0.0,
-            total_number_of_shares:0,
-       ownership_accumulator:HashMap::new(),     
+            cash_raised: 0.0,
+            total_number_of_shares: 0,
+            ownership_accumulator: HashMap::new(),
         }
     }
 }
 
-
+impl<'a> OutputAccumulator<'a> {
+    pub fn accumulate_ownership_transactions(
+        &mut self,
+        transaction_records: &dyn std::iter::Iterator<Item = Record>,
+    ) {
+    }
+}
