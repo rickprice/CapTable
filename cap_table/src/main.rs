@@ -128,13 +128,12 @@ fn testable_main(
 
     output_accumulator.accumulate_ownership_transactions(all_records);
 
-//    println!("Output accumulator is: {:?}", output_accumulator);
+    //    println!("Output accumulator is: {:?}", output_accumulator);
 
-//    let serialized = serde_json::to_string(&output_accumulator).unwrap();
+    //    let serialized = serde_json::to_string(&output_accumulator).unwrap();
     let serialized = serde_json::to_string_pretty(&output_accumulator).unwrap();
 
     println!("serialized = {}", serialized);
-
 
     return Ok(());
 }
