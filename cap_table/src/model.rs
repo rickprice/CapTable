@@ -31,7 +31,7 @@ where
     NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(de::Error::custom)
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct OwnershipRecord {
     pub investor: String,
     pub shares: u64,
@@ -53,7 +53,7 @@ pub struct OutputAccumulator {
     pub date: NaiveDate,
     pub cash_raised: f64,
     pub total_number_of_shares: u64,
-    pub ownership_accumulator: HashMap<String, OwnershipRecord>,
+    pub ownership_list: Vec<OwnershipRecord>,
 }
 
 impl OutputAccumulator {
@@ -62,7 +62,7 @@ impl OutputAccumulator {
             date,
             cash_raised: 0.0,
             total_number_of_shares: 0,
-            ownership_accumulator: HashMap::new(),
+            ownership_list: Vec::new(),
         }
     }
 }
@@ -77,15 +77,23 @@ impl OutputAccumulator {
         let filter_date = self.date;
         let records = transaction_records.filter(|r| r.investment_date <= filter_date);
 
-        records.for_each(|re| {
-            println!("the value is {:?}", re);
+        let mut ownership_accumulator = HashMap::new();
 
+        records.for_each(|re| {
+
+            // Update totals
             self.cash_raised += re.cash_paid;
             self.total_number_of_shares += re.shares_purchased;
 
-            let record_entry = self.ownership_accumulator.entry(re.investor.clone()).or_insert_with(|| OwnershipRecord::new(re.investor.clone(),0,0.0));
+            // Create or Update ownership entry without having to worry about whether its in the hashmap or
+            // not
+            let record_entry = ownership_accumulator.entry(re.investor.clone()).or_insert_with(|| OwnershipRecord::new(re.investor.clone(),0,0.0));
             record_entry.shares += re.shares_purchased;
             record_entry.cash_paid += re.cash_paid;
         });
+
+        // I hate having to a clone here, maybe there is a way to pull the value out instead to
+        // avoid the memory turnover
+        self.ownership_list = ownership_accumulator.values().cloned().collect();
     }
 }
