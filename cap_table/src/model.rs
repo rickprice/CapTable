@@ -67,8 +67,12 @@ impl OwnershipRecord {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct OutputAccumulator {
+    #[serde(
+        deserialize_with = "naive_date_from_str",
+        serialize_with = "naive_date_to_str"
+    )]
     pub date: NaiveDate,
     pub cash_raised: f64,
     pub total_number_of_shares: u64,
