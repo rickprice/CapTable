@@ -78,7 +78,7 @@ impl<'a> OutputAccumulator<'a> {
         let records = transaction_records.filter(|r| r.investment_date <= filter_date);
 
         records.for_each(|re| {
-            println!("the value is {:?}", re); 
+            println!("the value is {:?}", re);
 
             self.cash_raised += re.cash_paid;
             self.total_number_of_shares += re.shares_purchased;
