@@ -42,10 +42,23 @@ where
     serializer.serialize_str(&s)
 }
 
+fn f64_to_str_two_decimals<S>(number: &f64, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    // I don't like serializing with a different format than we deserialize with, maybe there is a
+    // way to pass in a custom format parameter...
+    let s = format!("{:.2}", number);
+    serializer.serialize_str(&s)
+}
+
+
+
 #[derive(Debug, Clone, Serialize)]
 pub struct OwnershipRecord {
     pub investor: String,
     pub shares: u64,
+    #[serde(serialize_with = "f64_to_str_two_decimals")]
     pub cash_paid: f64,
     pub ownership: f64,
 }
@@ -72,6 +85,7 @@ pub struct OutputAccumulator {
         serialize_with = "naive_date_to_str"
     )]
     pub date: NaiveDate,
+    #[serde(serialize_with = "f64_to_str_two_decimals")]
     pub cash_raised: f64,
     pub total_number_of_shares: u64,
     pub ownership_list: Vec<OwnershipRecord>,
