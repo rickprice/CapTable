@@ -60,6 +60,7 @@ pub struct OwnershipRecord {
     pub shares: u64,
     #[serde(serialize_with = "f64_to_str_two_decimals")]
     pub cash_paid: f64,
+    #[serde(serialize_with = "f64_to_str_two_decimals")]
     pub ownership: f64,
 }
 
