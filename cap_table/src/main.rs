@@ -129,5 +129,7 @@ fn testable_main(
 
     output_accumulator.accumulate_ownership_transactions(all_records);
 
+    println!("Output accumulator is: {:?}",output_accumulator);
+
     return Ok(());
 }

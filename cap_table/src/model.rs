@@ -72,8 +72,16 @@ impl<'a> OutputAccumulator<'a> {
         &mut self,
         transaction_records: impl Iterator<Item = Record>,
     ) {
-        let records = transaction_records.filter(|r| r.investment_date <= self.date);
+        // We only want to process records that are less than or equal to our report date, we
+        // ignore any others
+        let filter_date = self.date;
+        let records = transaction_records.filter(|r| r.investment_date <= filter_date);
 
-        records.for_each(|a| println!("the value is {:?}", a));
+        records.for_each(|re| {
+            println!("the value is {:?}", re); 
+
+            self.cash_raised += re.cash_paid;
+            self.total_number_of_shares += re.shares_purchased;
+        });
     }
 }
