@@ -118,8 +118,6 @@ fn testable_main(
                 .unwrap()
         });
 
-    //        println!("+++ REMOVE THIS +++ This is all_records {:?}", all_records.collect::<Vec<_>>());
-
     // If no report_date has been specified, then use the current date
     let filter_date = match report_date {
         None => Local::today().naive_local(),

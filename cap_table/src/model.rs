@@ -6,6 +6,8 @@ use chrono::NaiveDate;
 
 use serde::{de, Deserialize, Deserializer};
 
+use std::collections::HashMap;
+
 #[derive(Debug, Deserialize)]
 pub struct Record {
     #[serde(
@@ -28,3 +30,43 @@ where
     let s: String = Deserialize::deserialize(deserializer)?;
     NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(de::Error::custom)
 }
+
+
+#[derive(Debug)]
+pub struct OwnershipRecord<'a> {
+    pub investor: &'a str,
+    pub shares: u64,
+    pub cash_paid: f64,
+}
+
+impl<'a> OwnershipRecord<'a> {
+    pub fn new(investor: &'a str,shares: u64,cash_paid: f64) -> OwnershipRecord<'a> {
+        OwnershipRecord {
+            investor,
+            shares,
+            cash_paid,
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub struct OutputAccumulator<'a> {
+    pub date: NaiveDate,
+    pub cash_raised: f64,
+    pub total_number_of_shares: u64,
+    pub ownership_accumulator: HashMap<&'a str,OwnershipRecord<'a>>,
+}
+
+impl<'a> OutputAccumulator<'a> {
+    pub fn new(date: NaiveDate) -> OutputAccumulator<'a> {
+        OutputAccumulator {
+            date,
+            cash_raised:0.0,
+            total_number_of_shares:0,
+       ownership_accumulator:HashMap::new(),     
+        }
+    }
+}
+
+
