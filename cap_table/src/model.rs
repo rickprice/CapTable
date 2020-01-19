@@ -4,7 +4,7 @@ extern crate serde_json;
 
 use chrono::NaiveDate;
 
-use serde::{de, Serialize, Deserialize, Deserializer};
+use serde::{de, Serialize, Serializer, Deserialize, Deserializer};
 
 use std::collections::HashMap;
 
@@ -12,7 +12,8 @@ use std::collections::HashMap;
 pub struct Record {
     #[serde(
         rename(deserialize = "#INVESTMENT DATE"),
-        deserialize_with = "naive_date_from_str"
+        deserialize_with = "naive_date_from_str",
+        serialize_with = "naive_date_to_str"
     )]
     pub investment_date: NaiveDate,
     #[serde(rename(deserialize = " SHARES PURCHASED"))]
@@ -30,6 +31,24 @@ where
     let s: String = Deserialize::deserialize(deserializer)?;
     NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(de::Error::custom)
 }
+
+ // The signature of a serialize_with function must follow the pattern:
+    //
+    //    fn serialize<S>(&T, S) -> Result<S::Ok, S::Error>
+    //    where
+    //        S: Serializer
+    //
+    // although it may also be generic over the input types T.
+    fn naive_date_to_str<S>(
+        date: &NaiveDate,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = format!("{}", date.format("%Y-%m-%d"));
+        serializer.serialize_str(&s)
+    }
 
 #[derive(Debug,Clone,Serialize)]
 pub struct OwnershipRecord {
