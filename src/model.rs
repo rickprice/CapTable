@@ -71,7 +71,6 @@ where
     serializer.serialize_str(&s)
 }
 
-
 // This is the Ownership Record, which is used inside the OutputAccumulator to track the summary
 // data for people who own shares
 #[derive(Debug, Clone, Serialize)]
@@ -90,13 +89,13 @@ impl OwnershipRecord {
             investor,
             shares,
             cash_paid,
-            ownership:0.0,
+            ownership: 0.0,
         }
     }
 
     // Update the ownership percentage after all the share records have been processed
-    pub fn fix_ownership_percentage(&mut self,total_shares: u64) {
-        self.ownership = (self.shares as f64)/(total_shares as f64)*100.0;
+    pub fn fix_ownership_percentage(&mut self, total_shares: u64) {
+        self.ownership = (self.shares as f64) / (total_shares as f64) * 100.0;
     }
 }
 
@@ -129,12 +128,12 @@ impl OutputAccumulator {
     pub fn accumulate_ownership_transactions(
         &mut self,
         transaction_records: impl Iterator<Item = Record>,
-    ) -> Result<(),CapTableError> {
+    ) -> Result<(), CapTableError> {
         // We only want to process records that are less than or equal to our report date, we
         // ignore any others, so filter the incoming records based on our report date
         // We create a local variable for filter_date to avoid creating a Lambda, which causes
-        // ownership issues with self in this case (Rust is very, very careful to always know 
-        // who is carrying the ball, and one one thing can have the ball at one time, meaning 
+        // ownership issues with self in this case (Rust is very, very careful to always know
+        // who is carrying the ball, and one one thing can have the ball at one time, meaning
         // we don't need a garbage collector).
         let filter_date = self.date;
         let records = transaction_records.filter(|r| r.investment_date <= filter_date);
@@ -162,7 +161,7 @@ impl OutputAccumulator {
             record_entry.cash_paid += re.cash_paid;
         });
 
-        // Have to test for the total_number_of_shares value being zero because otherwise we will get a division 
+        // Have to test for the total_number_of_shares value being zero because otherwise we will get a division
         // by zero error when we try to fixup the ownership percentage, in the function call after
         // this
         if self.total_number_of_shares == 0 {
@@ -171,7 +170,9 @@ impl OutputAccumulator {
 
         // Correct the ownership percentage of all our records since they start out at zero, when
         // we create the record
-        ownership_accumulator.values_mut().for_each(|r| r.fix_ownership_percentage(self.total_number_of_shares));
+        ownership_accumulator
+            .values_mut()
+            .for_each(|r| r.fix_ownership_percentage(self.total_number_of_shares));
 
         // I hate having to a clone here, maybe there is a way to pull the value out instead to
         // avoid the memory turnover, I couldn't find a way to crack the hashmap and reuse the

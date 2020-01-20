@@ -41,7 +41,7 @@ fn main() -> Result<(), CapTableError> {
         .get_matches();
 
     // Get the input file path, we basically know that we will have a value because of how we setup
-    // Clap, so we use unwrap instead of ? to panic the program if there isn't a value, which should 
+    // Clap, so we use unwrap instead of ? to panic the program if there isn't a value, which should
     // be impossible. Remember that Rust doesn't have NULLs, you use an Option<> when you might not
     // have a value.
     let input_file_path = matches.value_of("CSVFile").unwrap();
@@ -73,23 +73,23 @@ fn testable_main(
     // We know we will never have a null input_file_path, because we weren't passed an Option<>, so
     // we don't check for things like that
 
-/*    
-    println!(
-        "We will be reading the CSV data from the file located at: {}",
-        input_file_path
-    );
+    /*
+        println!(
+            "We will be reading the CSV data from the file located at: {}",
+            input_file_path
+        );
 
-    // Decide what to print based on whether we got a report_date or not...
-    match report_date {
-        None => println!("We will be using today's date for the report date"),
-        Some(d) => println!(
-            "We will be using the following date for the report date: {}",
-            d
-        ),
-    };
-*/
+        // Decide what to print based on whether we got a report_date or not...
+        match report_date {
+            None => println!("We will be using today's date for the report date"),
+            Some(d) => println!(
+                "We will be using the following date for the report date: {}",
+                d
+            ),
+        };
+    */
 
-    // +++ NOTICE +++ When you see a ?, particularly at the end of a line, it tests for an 
+    // +++ NOTICE +++ When you see a ?, particularly at the end of a line, it tests for an
     // error, and returns early from the function if one has occured
 
     let input_file_path_path = Path::new(input_file_path);
