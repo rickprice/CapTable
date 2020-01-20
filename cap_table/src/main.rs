@@ -29,14 +29,6 @@ fn main() -> Result<(), CapTableError> {
                 .takes_value(true)
                 .help("A CSV input file that contains data used to create a Cap Table"),
         )
-        // JSONOutputFile is an optional argument to the program
-        .arg(
-            Arg::with_name("JSONOutputFile")
-                .short("o")
-                .long("JSONOutputFile")
-                .takes_value(true)
-                .help("A file to write the JSON output to"),
-        )
         // reportDate is an optional argument to the program
         .arg(
             Arg::with_name("reportDate")
@@ -52,8 +44,6 @@ fn main() -> Result<(), CapTableError> {
     let input_file_path = matches
         .value_of("CSVFile")
         .ok_or(CapTableError::NoCSVFileSupplied)?;
-    // Get the output file path, but we don't care if it was not passed in
-    let output_file_path = matches.value_of("JSONOutputFile");
 
     // if no report_date was passed in, then fine, otherwise parse it into a NaiveDate, if that
     // fails, then return an error...
@@ -68,30 +58,24 @@ fn main() -> Result<(), CapTableError> {
 
     // To make testing easier, we put the important parts of main into another function so we can
     // call it in test code
-    testable_main(input_file_path, output_file_path, report_date)?;
+    testable_main(input_file_path, report_date)?;
 
     Ok(())
 }
 
 fn testable_main(
     input_file_path: &str,
-    output_file_path: Option<&str>,
     report_date: Option<NaiveDate>,
 ) -> Result<(), CapTableError> {
-    // We know we will never have a null input_file_path
+    // We know we will never have a null input_file_path, because we weren't passed an Option<>
+/*    
     println!(
         "We will be reading the CSV data from the file located at: {}",
         input_file_path
     );
-    // In this case we may or may not get an output_path, but if not, we will write to stdout, this
-    // just says so, it does not set the output file to stdout
-    println!(
-        "We will be writing our output to: {}",
-        match output_file_path {
-            None => "Stdout",
-            Some(s) => s,
-        }
-    );
+*/
+
+/*    
     // Decide what to print based on whether we got a report_date or not...
     match report_date {
         None => println!("We will be using today's date for the report date"),
@@ -100,9 +84,10 @@ fn testable_main(
             d
         ),
     };
+*/
 
     let input_file_path_path = Path::new(input_file_path);
-    // This time, if we have an error, pass the error value into the CapTableError...
+    // Pass the error value into the CapTableError...
     let input_file = File::open(&input_file_path_path)
         // We map the error so that we can return it in our own structure
         .map_err(|e| CapTableError::UnableToOpenCSVFileForRead(e))?;
@@ -126,16 +111,14 @@ fn testable_main(
 
     let mut output_accumulator = OutputAccumulator::new(filter_date);
 
-    output_accumulator.accumulate_ownership_transactions(all_records);
+    output_accumulator.accumulate_ownership_transactions(all_records)?;
 
     //    println!("Output accumulator is: {:?}", output_accumulator);
 
     //    let serialized = serde_json::to_string(&output_accumulator).unwrap();
     let serialized = serde_json::to_string_pretty(&output_accumulator).unwrap();
 
-    println!();
-    println!();
-    println!("serialized = {}", serialized);
+    println!("{}", serialized);
 
     return Ok(());
 }

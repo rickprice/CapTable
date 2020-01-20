@@ -8,6 +8,8 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 use std::collections::HashMap;
 
+use crate::error::CapTableError;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
     #[serde(
@@ -107,7 +109,7 @@ impl OutputAccumulator {
     pub fn accumulate_ownership_transactions(
         &mut self,
         transaction_records: impl Iterator<Item = Record>,
-    ) {
+    ) -> Result<(),CapTableError> {
         // We only want to process records that are less than or equal to our report date, we
         // ignore any others
         let filter_date = self.date;
@@ -129,10 +131,19 @@ impl OutputAccumulator {
             record_entry.cash_paid += re.cash_paid;
         });
 
+        // Have to test for total value being zero because otherwise we will get a division by zero
+        // error when we try to fixup the ownership percentage
+        if self.total_number_of_shares == 0 {
+            return Err(CapTableError::TotalSharesIsZero);
+        }
+
+        // Correct the ownership percentage of all our records since they start out at zero
         ownership_accumulator.values_mut().for_each(|r| r.fix_ownership_percentage(self.total_number_of_shares));
 
         // I hate having to a clone here, maybe there is a way to pull the value out instead to
         // avoid the memory turnover
         self.ownership_list = ownership_accumulator.values().cloned().collect();
+
+        Ok(())
     }
 }

@@ -8,12 +8,9 @@ pub enum CapTableError {
     UnableToOpenCSVFileForRead(std::io::Error),
     UnableToReadCSVData(csv::Error),
 
-    // Problems with the JSON output file
-    UnableToOpenJSONOutputFileForWrite,
+    // Logic problems with the data
+    TotalSharesIsZero,
 
     // Problems with the report date
     InvalidReportDateSupplied(chrono::ParseError),
-
-    // General problems
-    TotalSharesIsZero,
 }
