@@ -168,16 +168,9 @@ impl OutputAccumulator {
             return Err(CapTableError::TotalSharesIsZero);
         }
 
-        // Correct the ownership percentage of all our records since they start out at zero, when
-        // we create the record
-        ownership_accumulator
-            .values_mut()
-            .for_each(|r| r.fix_ownership_percentage(self.total_number_of_shares));
-
-        // I hate having to a clone here, maybe there is a way to pull the value out instead to
-        // avoid the memory turnover, I couldn't find a way to crack the hashmap and reuse the
-        // values inside, in that case the hashmap shell would be automatically discarded
-        self.ownership_list = ownership_accumulator.values().cloned().collect();
+        // Transfer the values from the ownership_accumulator to the ownership_vector, but fixup
+        // the ownership percentage while we do that, to reduce passes over the data
+        self.ownership_list = ownership_accumulator.into_iter().map(|(_key, mut value)| {value.fix_ownership_percentage(self.total_number_of_shares); value}).collect();
 
         // Return nothing, but signal that there was no error (this function doesn't have a value
         // return, just nothing or an error of some sort.
