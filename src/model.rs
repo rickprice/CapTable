@@ -20,8 +20,8 @@ use crate::error::CapTableError;
 pub struct Record {
     // (rename) We need to tell Serde that the name in the CSV file won't match the name of the
     // field in this structure
-    // (deserialize_with) Tell Serde to deserialize this field with a special function
-    // (serialize_with) Tell Serde to serialize this field with a special function
+    // (deserialize_with) Tell Serde to deserialize this field with a special function (for the CSV)
+    // (serialize_with) Tell Serde to serialize this field with a special function (AKA for the JSON)
     #[serde(
         rename(deserialize = "#INVESTMENT DATE"),
         deserialize_with = "naive_date_from_str",
@@ -36,7 +36,7 @@ pub struct Record {
     pub investor: String,
 }
 
-// Special function to be used by the Serde library to deserialize a Naieve date, normally things
+// Special function to be used by the Serde library to deserialize a Naive date, normally things
 // including dates deserialize automagically, but I guess the library authers didn't expect us to
 // serialize or deserialize Naive Dates, Rust prefers dates with time zones since you can get into
 // so many problems when you ignore time zones in the real world.
@@ -48,7 +48,7 @@ where
     NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(de::Error::custom)
 }
 
-// Special function to serilize Naive dates, see comments above...
+// Special function to serialize Naive dates, see comments above...
 fn naive_date_to_str<S>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -60,7 +60,7 @@ where
 }
 
 // Serde normally outputs float values with a lot more precision, this is how we reduce that
-// precision for the report
+// precision for the JSON report
 fn f64_to_str_two_decimals<S>(number: &f64, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -133,7 +133,7 @@ impl OutputAccumulator {
         // ignore any others, so filter the incoming records based on our report date
         // We create a local variable for filter_date to avoid creating a Lambda, which causes
         // ownership issues with self in this case (Rust is very, very careful to always know
-        // who is carrying the ball, and one one thing can have the ball at one time, meaning
+        // who is carrying the ball, and only one thing can have the ball at one time, meaning
         // we don't need a garbage collector).
         let filter_date = self.date;
         let records = transaction_records.filter(|r| r.investment_date <= filter_date);
@@ -152,8 +152,9 @@ impl OutputAccumulator {
             // hashmap already, and lets you supply a default value
             let record_entry = ownership_accumulator
                 // We have to clone the string because the lifetime of the incoming record is less than this
-                // structure, so its copy of the string will be deleted before this one should be,
-                // hence we create a new one that will live long enough
+                // structure which we are creating, so the original copy of the string will be deleted before
+                // the one in the structure we are creating should be. Hence we clone() a new one that will
+                // live long enough
                 .entry(re.investor.clone())
                 .or_insert_with(|| OwnershipRecord::new(re.investor.clone(), 0, 0.0));
             // Accumulate values into our new record where we are recording the investor
@@ -161,16 +162,24 @@ impl OutputAccumulator {
             record_entry.cash_paid += re.cash_paid;
         });
 
-        // Have to test for the total_number_of_shares value being zero because otherwise we will get a division
-        // by zero error when we try to fixup the ownership percentage, in the function call after
+        // Have to test for the total_number_of_shares value being zero because otherwise we will get a
+        // division by zero error when we try to fixup the ownership percentage, in the function call after
         // this
         if self.total_number_of_shares == 0 {
             return Err(CapTableError::TotalSharesIsZero);
         }
 
         // Transfer the values from the ownership_accumulator to the ownership_vector, but fixup
-        // the ownership percentage while we do that, to reduce passes over the data
-        self.ownership_list = ownership_accumulator.into_iter().map(|(_key, mut value)| {value.fix_ownership_percentage(self.total_number_of_shares); value}).collect();
+        // the ownership percentage while we do that to reduce passes over the data. This is
+        // allowing us to avoid cloning the Ownership record, which makes things more efficient in
+        // CPU and memory churn.
+        self.ownership_list = ownership_accumulator
+            .into_iter()
+            .map(|(_key, mut value)| {
+                value.fix_ownership_percentage(self.total_number_of_shares);
+                value
+            })
+            .collect();
 
         // Return nothing, but signal that there was no error (this function doesn't have a value
         // return, just nothing or an error of some sort.

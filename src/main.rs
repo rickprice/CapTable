@@ -68,6 +68,7 @@ fn testable_main(
     // &str is a string, but a reference to one, it has to live longer than anyhing we do with it,
     // and the Rust compiler will make sure of that for us...
     input_file_path: &str,
+    // We may or may not have an date, so we wrap it in an Option<>
     report_date: Option<NaiveDate>,
 ) -> Result<(), CapTableError> {
     // We know we will never have a null input_file_path, because we weren't passed an Option<>, so
