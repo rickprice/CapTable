@@ -73,7 +73,7 @@ where
 
 // This is the Ownership Record, which is used inside the OutputAccumulator to track the summary
 // data for people who own shares
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Serialize)]
 pub struct OwnershipRecord {
     pub investor: String,
     pub shares: u64,
