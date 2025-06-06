@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 /// This Enum lists the errors we expect to deal with in CapTable
-#[derive(Error,Debug)]
+#[derive(Error, Debug)]
 pub enum CapTableError {
     // Problems with the CSV input file
     #[error("Unable to open CSV input file")]

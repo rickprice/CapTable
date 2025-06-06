@@ -4,7 +4,7 @@ extern crate serde_json;
 
 use chrono::NaiveDate;
 
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 
 use std::collections::HashMap;
 

@@ -7,7 +7,7 @@ mod error;
 mod model;
 
 use chrono::{Local, NaiveDate};
-use clap::{crate_version, App, Arg};
+use clap::{App, Arg, crate_version};
 use error::CapTableError;
 
 use std::fs::File;
