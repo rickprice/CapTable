@@ -17,4 +17,7 @@ pub enum CapTableError {
     // Problems with the report date
     #[error("Invalid report date supplied")]
     InvalidReportDateSupplied(#[from] chrono::ParseError),
+
+    #[error("Failed to serialize output")]
+    SerializationError,
 }
