@@ -112,7 +112,7 @@ fn testable_main(
 
     // If no report_date has been specified, then use the current date
     let filter_date = match report_date {
-        None => Local::today().naive_local(),
+        None => Local::now().date_naive(),
         Some(filter_date) => filter_date,
     };
 
